@@ -4,7 +4,7 @@ README
   
 AUTHORS
 
-  The creators of this calculator and Matt Sedlar and Milla Sanes.
+  The creators of this calculator are Matt Sedlar and Milla Sanes.
 
 CONTACT
 
