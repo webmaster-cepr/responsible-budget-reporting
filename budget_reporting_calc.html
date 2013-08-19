@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<head>
+<script src="js/tabletop.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    // Our Google Docs Spreadsheet
+    var public_spreadsheet_url = 'https://docs.google.com/spreadsheet/pub?key=0AobCoier8-0ndDFwMWQ4MkdyQUZMUDRoWFVhMkUwcWc&single=true&gid=0&output=html';
+
+	function calculate_budget_percent() {
+
+	var budget_year = document.getElementById("budget_year").value;	
+	var budget_percent = document.getElementById("budget_percent");
+	var budget_description = document.getElementById("budget_description");
+	var budget_amount = document.getElementById("budget_amount");
+	var add_amount = document.getElementById("add_amount").value;
+	var budget_span = document.getElementById("budget_span").value;
+    
+    var total_outlay = 0; // Later we'll need to add the overall years if the user selects a range in budget_span above
+	var total_percent;
+	
+	// Tabletop calls our public spreadsheet url and follows up with showInfo function
+	
+	Tabletop.init( { key: public_spreadsheet_url,
+                         callback: showInfo,
+                         simpleSheet: true } );
+      
+      function showInfo(data) {
+			// data comes through as a simple array since simpleSheet is turned on
+			// we loop through the data to determine year selected by user and outlay
+
+			var budget_end = parseFloat(budget_year) + parseFloat(budget_span);
+			var budget_options = document.getElementById("budget_options");
+			
+								
+			for (var i = 0; i <= data.length; i++) {
+				
+				find_checked();		
+				
+				// this checks if our budget year matches the year but not beyond the end year on each loop
+				if (budget_year == data[i].year && budget_year <= budget_end) {
+				
+				switch(value) {
+				
+					case "outlays":	
+					total_outlay = total_outlay + parseFloat(data[i].outlays.replace(/\,/g,''));
+					budget_description.innerHTML = "Percent of Budget";
+					break;
+					
+					case "revenue":
+					total_outlay = total_outlay + parseFloat(data[i].revenue.replace(/\,/g,''));
+					budget_description.innerHTML = "Percent of Revenues";					
+					break;
+
+					case "population":
+					total_outlay = total_outlay + parseFloat(data[i].population.replace(/\,/g,''));
+					budget_description.innerHTML = "Per Capita";					
+					break;
+
+					case "discretionary":
+					total_outlay = total_outlay + parseFloat(data[i].discretionary.replace(/\,/g,''));
+					budget_description.innerHTML = "Percent of Discretionary";					
+					break;
+
+				}
+					
+				budget_year++;
+						console.log(total_outlay);
+
+				}
+				
+				if (value != "population") {
+				// total_percent calculates the budget percent [add_amount is our thousands, millions, etc.]
+				total_percent = ((budget_amount.value * add_amount)/total_outlay) * 100;
+				
+					
+					// If it's a really low percentage we want a better way to communicate that than 0.0000%
+					if (total_percent > 0.00009) {
+					
+					budget_percent.innerHTML = total_percent.toFixed(4) + "%";
+	
+					}
+					
+					else { 
+					
+					budget_percent.innerHTML = "<span>less than</span> 0.0001%";
+
+					}
+				
+				}
+				
+				else {
+				
+					total_percent = ((budget_amount.value * add_amount)/total_outlay);	
+				
+					if (total_percent > 0.009) {
+					// total_percent calculates the budget percent [add_amount is our thousands, millions, etc.]
+							
+					budget_percent.innerHTML = "$" + total_percent.toFixed(2);			
+
+					
+					}
+
+					else { 
+					
+					budget_percent.innerHTML = "<span>less than</span> $0.01";
+
+					}
+				
+				}
+			
+			}
+
+		}
+		
+	}
+	
+	function find_checked() {
+		
+		for (var x = 0; x <= budget_options.length; x++) {
+			if (budget_options[x].type == 'radio' && budget_options[x].checked) {
+			// get value, set checked flag or do whatever you need to
+			value = budget_options[x].value;
+			
+			return value;
+			}
+		}
+		
+	}
+	
+	function show_advanced () {
+		
+		var advanced = document.getElementById("advanced");
+		var calc_space = document.getElementById("calc_space");
+		
+		if (advanced.style.display == "block") {
+		
+		advanced.style.display = "none";
+		calc_space.style.height = "100px";
+		
+		}
+		
+		else {
+		
+		advanced.style.display = "block";
+		calc_space.style.height = "150px";
+		
+		}	
+			
+		
+	}
+		
+
+</script>
+<style>
+
+#advanced {
+	
+	display:none;
+	padding-left: 10px;
+	
+}
+
+#calc_space {
+	width: 600px;
+	height: 100px;
+	background-color: #7da6da;
+
+	}
+	
+#calc_space_left {
+
+	float: left; 
+	width: 340px; 
+	padding-left: 10px;
+
+}	
+
+#calc_space_right {
+
+	float: right; 
+	width: 250px; 
+	
+
+}
+
+#calc_space p, #calc_space span {
+
+	font-family: Verdana, sans-serif;
+	font-weight: bold;
+	font-size: 11px;
+	}
+	
+#budget_options { 
+	
+	font-family: Verdana, sans-serif;
+	font-size: 10px; 
+	color: #fff;
+	}
+	
+
+#budget_percent {
+
+		font-size: 16px;
+		font-weight: bold;
+		background-color: white;
+		padding: 3px;
+		box-shadow: -1px -1px 0px #000;
+		width: 125px;
+		
+		}
+		
+#answer {
+
+	float: right;
+	padding-right: 12px;
+	padding-top: 12px;
+	width: 162px;
+
+}
+	
+	</style>
+
+</head>
+
+<body>
+
+
+
+<div id="calc_space">
+	
+	<div id="advanced">
+
+		<p style="padding-top: 6px;">I would like to see this expressed as</p>
+ 
+        <form id="budget_options">
+		<input type="radio" name="option" id="population" value="population">per capita
+		<input type="radio" name="option" id="revenue" value="revenue">% of total revenues
+		<input type="radio" name="option" id="discretionary" value="discretionary">% of discretionary spending
+		<input type="radio" name="option" id="outlays" checked="checked" value="outlays">% of the unified budget	
+		</form>
+		
+	</div>	
+
+
+		<div id="calc_space_left">		
+		
+				<div style="float: left;">
+                    <p>One Year Dollar Amount<br/> of Program/Cut/Etc*</p> 
+					<div style="float:left;">
+					$<input id="budget_amount" value="0" size="4" />
+					</div>
+
+					<div style="float: right;">
+					<form>
+					 <select id="add_amount">
+						<option value="1000">thousand</option>
+						<option value="1000000">million</option>
+						<option value="1000000000">billion</option>
+						<option value="1000000000000">trillion</option>
+					</select>
+					</form>
+
+					</div>
+
+	            </div>
+		
+				<div style="float: right; padding-top: 13px; text-align:center">
+					
+					<div style="float:left; padding-right:12px"><p>Over </p>
+					
+					<form method="post">
+						<select id="budget_span">
+						<option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option>
+
+						</select> <span>years</span>
+					</form>
+					</div>
+					
+					<div style="float:right;">
+						
+					<p style="text-align:center; margin-bottom: 12px;">Starting</p> 
+
+
+						<select id="budget_year">
+						<script>
+							for (var i = 1979; i <= 2023; i++) {
+							
+							if (i == 2013) {
+							document.write("<option value='" + i + "' selected>" + i + "</option>");	
+							}
+							
+							else {	
+							document.write("<option value='" + i + "'>" + i + "</option>");	
+							}	
+							}
+							
+						</script>
+
+						</select>
+					
+				
+				    </div>
+				</div>
+		</div>
+		
+		<div id="calc_space_right">
+		
+				<div style="float: left; padding: 25px 0px 0px 25px;">
+		
+				<p><button onclick="calculate_budget_percent()">=</button></td>
+			
+				</div>
+				
+				<div id="answer">
+			
+			    <p id="budget_description">Percent of Budget</p>
+				<div id="budget_percent">0%</div>
+		
+				</div>
+				
+		</div>
+
+</div>
+
+<button onclick="show_advanced()">Toggle Advanced/Basic Calculator</button>
+</body>
+
+</html>
