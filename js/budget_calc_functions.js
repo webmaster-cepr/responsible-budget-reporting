@@ -1,4 +1,3 @@
-
     // Our Google Docs Spreadsheet
     var public_spreadsheet_url = 'https://docs.google.com/spreadsheet/pub?key=0AobCoier8-0ndDFwMWQ4MkdyQUZMUDRoWFVhMkUwcWc&single=true&gid=0&output=html';
 
@@ -66,7 +65,7 @@
 				
 				if (value != "population") {
 				// total_percent calculates the budget percent [add_amount is our thousands, millions, etc.]
-				total_percent = ((budget_amount.value * add_amount)/total_outlay) * 100;
+				total_percent = ((budget_amount.value.replace(/\,/g,'') * add_amount)/total_outlay) * 100;
 				
 					
 					// If it's a really low percentage we want a better way to communicate that than 0.0000%
@@ -86,7 +85,7 @@
 				
 				else {
 				
-					total_percent = ((budget_amount.value * add_amount)/total_outlay);	
+					total_percent = ((budget_amount.value.replace(/\,/g,'') * add_amount)/total_outlay);	
 				
 					if (total_percent > 0.009) {
 					// total_percent calculates the budget percent [add_amount is our thousands, millions, etc.]
