@@ -27,4 +27,4 @@ COPYING/LICENSE
   
 BUGS
 
-  * Problems not working in iOS/Firefox.
+  * Problems not working in Apple OS/Firefox.
